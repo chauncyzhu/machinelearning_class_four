@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 # 参数定义
 iteration_times = 500  # 迭代次数
 K = 10  # 潜在特征数
-lamb = 0.1  # 惩罚系数
+lamb = 0.5  # 惩罚系数
 fig_config = {  # 绘图参数
     'title': 'validation loss',
     'xlabel': 'iteration times',
@@ -59,7 +59,7 @@ def padding_data(x ,y ,value, default=0):
 
 
 def loss_function(y, y_pred, lamb):
-    return np.mean(np.square(y - y_pred)) + lamb * (np.mean(np.square(y)) + np.mean(np.square(y_pred)))
+    return np.mean(np.square(y - y_pred)) + lamb * (np.linalg.norm(y) + np.linalg.norm(y_pred))/len(y)
 
 
 def plot_result(x, y, fig_config):
@@ -142,8 +142,8 @@ def task_two():
         x, y = np.random.randint(user_num), np.random.randint(item_num)   # 随机选取一个sample，实际上就是选取横纵坐标
 
         # 计算梯度
-        user_matrix[x] = user_matrix[x] + learning_rate * ((train_rate[x , y] - np.dot(user_matrix[x], item_matrix[y])) * item_matrix[y] - lamb * user_matrix[x])
-        item_matrix[y] = item_matrix[y] + learning_rate * ((train_rate[x, y] - np.dot( user_matrix[x], item_matrix[y])) * user_matrix[x] - lamb * item_matrix[y])
+        user_matrix[x] = user_matrix[x] - learning_rate * ((train_rate[x , y] - np.dot(user_matrix[x], item_matrix[y])) * item_matrix[y] - lamb * user_matrix[x])
+        item_matrix[y] = item_matrix[y] - learning_rate * ((train_rate[x, y] - np.dot( user_matrix[x], item_matrix[y])) * user_matrix[x] - lamb * item_matrix[y])
 
         # 计算validation loss
         rate_matrix = np.dot(user_matrix, item_matrix.T)
@@ -157,4 +157,4 @@ def task_two():
 
 
 if __name__ == '__main__':
-    task_one()
+    task_two()
